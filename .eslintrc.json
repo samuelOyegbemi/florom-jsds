@@ -21,6 +21,7 @@
     "import/no-unresolved": 2,
     "import/prefer-default-export": 0,
     "indent": [2, 2, { "SwitchCase": 1 }],
+    "max-classes-per-file": ["error", 2],
     "prefer-const": "off",
     "max-len": [
       "error",
