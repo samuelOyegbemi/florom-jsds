@@ -29,51 +29,52 @@ export default class SinglyLinkedList {
   /**
    * @name push
    * @param {*} value
-   * @return {SinglyLinkedList} Singly Linked List instance
+   * @return {SinglyLinkedList} List
    */
   push(value) {
-    const newNode = new SLLNode(value);
+    const newTail = new SLLNode(value);
     if (!this.head) {
-      this.head = newNode;
+      this.head = newTail;
       this.tail = this.head;
     } else {
-      this.tail.next = newNode;
-      this.tail = newNode;
+      this.tail.next = newTail;
+      this.tail = newTail;
     }
     this.length += 1;
     return this;
   }
 
-  /**
-   * @name reduce
-   * @param {function(*, *, *, *):*} callback
-   * @param {*} [prev]
-   * @return {*} Callback result
-   */
-  reduce(callback, prev) {
-    // eslint-disable-next-line require-jsdoc
-    const doRecursiveReduce = (cb, p = null, start = this.head, index = 0) => {
-      if (!start) return p;
-      p = cb(p, start, index, this);
-      if (start.next) {
-        p = doRecursiveReduce(cb, p, start.next, index + 1);
-      }
-      return p;
-    };
-    return doRecursiveReduce(callback, prev);
-  }
+  // /**
+  //  * @name reduce
+  //  * @param {function(*, *, *, *):*} accumulator
+  //  * @param {*} [initial]
+  //  * @return {*} Callback result
+  //  */
+  // reduce(accumulator, initial) {
+  //   let current = this.head;
+  //   let prev = initial;
+  //   let i = 0;
+  //   do {
+  //     prev = accumulator(prev, current, i, this);
+  //     i += 1;
+  //     current = current.next;
+  //   } while (current);
+  //   return prev;
+  // }
 
   /**
    * @name pop
-   * @return {null|SLLNode} SLL Node
+   * @return {SLLNode} Node
    */
   pop() {
     if (!this.head) return undefined;
-    let newTail = this.reduce((prev, current) => {
-      if (current && current.next) return current;
-      return prev;
-    }, this.head);
-    const prevTail = this.tail;
+    let currentTail = this.head;
+    let newTail = currentTail;
+    while (currentTail.next) {
+      newTail = currentTail;
+      currentTail = currentTail.next;
+    }
+    const oldTail = this.tail;
     this.tail = newTail;
     this.tail.next = null;
     this.length -= 1;
@@ -81,6 +82,82 @@ export default class SinglyLinkedList {
       this.head = null;
       this.tail = null;
     }
-    return prevTail;
+    return oldTail;
+  }
+
+  /**
+   * @name shift
+   * @param {*} value
+   * @return {SinglyLinkedList} List
+   */
+  unshift(value) {
+    const newHead = new SLLNode(value);
+    let oldHead = this.head;
+    this.head = newHead;
+    this.head.next = oldHead;
+    this.length += 1;
+    return this;
+  }
+
+  /**
+   * @name shift
+   * @return {SLLNode} Node
+   */
+  shift() {
+    if (!this.head) return undefined;
+    const oldHead = this.head;
+    this.head = oldHead.next;
+    this.length -= 1;
+    if (this.length === 0) this.tail = null;
+    return oldHead;
+  }
+
+  /**
+   * @name get
+   * @param {number} index
+   * @return {SLLNode} SLL Node
+   */
+  get(index) {
+    if (index < 0 || index >= this.length) return undefined;
+    let currentIndex = 0;
+    let currentNode = this.head;
+    while (currentIndex !== index) {
+      currentIndex += 1;
+      currentNode = currentNode.next;
+    }
+    return currentNode;
+  }
+
+  /**
+   * @name set
+   * @param {number} index
+   * @param {*} value
+   * @return {boolean} SLL Node
+   */
+  set(index, value) {
+    let currentNode = this.get(index);
+    if (currentNode) {
+      currentNode.value = value;
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * @name insert
+   * @param {number} index
+   * @param {*} value
+   * @return {boolean} SLL Node
+   */
+  insert(index, value) {
+    if (index < 0 || index > this.length) return false;
+    if (index === 0) return !!this.unshift(value);
+    if (index === this.length) return !!this.push(value);
+    const newNode = new SLLNode(value);
+    let prevNode = this.get(index - 1);
+    newNode.next = prevNode.next;
+    prevNode.next = newNode;
+    this.length += 1;
+    return true;
   }
 }
