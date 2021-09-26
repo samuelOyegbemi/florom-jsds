@@ -27,6 +27,37 @@ export default class SinglyLinkedList {
   }
 
   /**
+   * Iterator
+   * @return {Generator<SLLNode, void, ?>} Generator
+   */
+  *[Symbol.iterator]() {
+    let nextNode = this.head;
+    let currentNode = null;
+    while (nextNode) {
+      currentNode = nextNode;
+      nextNode = currentNode.next;
+      yield currentNode;
+    }
+  }
+
+  /**
+   * @name forEach
+   * @param {function(SLLNode, number, SinglyLinkedList)} callback
+   * @return {Array.<*>} Array
+   */
+  forEach(callback) {
+    let nextNode = this.head;
+    let currentIndex = -1;
+    let currentNode = null;
+    while (nextNode) {
+      currentNode = nextNode;
+      nextNode = currentNode.next;
+      currentIndex += 1;
+      callback(currentNode, currentIndex, this);
+    }
+  }
+
+  /**
    * @name push
    * @param {*} value
    * @return {SinglyLinkedList} List
@@ -101,7 +132,7 @@ export default class SinglyLinkedList {
 
   /**
    * @name find
-   * @param {function(SLLNode, number):boolean} callback
+   * @param {function(SLLNode, number, SinglyLinkedList):boolean} callback
    * @param {boolean} [returnIndex]
    * @return {SLLNode|number} Copied list
    */
@@ -114,7 +145,7 @@ export default class SinglyLinkedList {
     while (nextNode && !found) {
       currentIndex += 1;
       currentNode = nextNode;
-      found = !!callback(currentNode, currentIndex);
+      found = !!callback(currentNode, currentIndex, this);
       nextNode = currentNode.next;
     }
     if (returnIndex) return found ? currentIndex : -1;
@@ -195,13 +226,7 @@ export default class SinglyLinkedList {
    */
   reverse() {
     let reversedList = new SinglyLinkedList();
-    let next = this.head;
-    let current = null;
-    while (next) {
-      current = next;
-      reversedList.unshift(current.value);
-      next = current.next;
-    }
+    this.forEach(node => reversedList.unshift(node.value));
     return reversedList;
   }
 
@@ -211,13 +236,17 @@ export default class SinglyLinkedList {
    */
   copy() {
     let copiedList = new SinglyLinkedList();
-    let next = this.head;
-    let current = null;
-    while (next) {
-      current = next;
-      copiedList.push(current.value);
-      next = current.next;
-    }
+    this.forEach(node => copiedList.push(node.value));
     return copiedList;
+  }
+
+  /**
+   * @name toArray
+   * @return {Array.<*>} Array
+   */
+  toArray() {
+    let result = [];
+    this.forEach(node => result.push(node.value));
+    return result;
   }
 }
