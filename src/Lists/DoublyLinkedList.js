@@ -48,9 +48,8 @@ export default class DoublyLinkedList extends LinkedList {
       return oldTail.value;
     }
     this.tail = oldTail.prev;
-    this.length -= 1;
     this.tail.next = null;
-    if (this.length === 0) this.head = null;
+    this.length -= 1;
     oldTail.prev = null;
     return oldTail.value;
   }
@@ -88,9 +87,8 @@ export default class DoublyLinkedList extends LinkedList {
     }
     this.head = oldHead.next;
     this.head.prev = null;
-    this.length -= 1;
-    if (this.length === 0) this.tail = null;
     oldHead.next = null;
+    this.length -= 1;
     return oldHead.value;
   }
 }
