@@ -36,13 +36,13 @@ export default class SinglyLinkedList {
     while (nextNode) {
       currentNode = nextNode;
       nextNode = currentNode.next;
-      yield currentNode;
+      yield currentNode.value;
     }
   }
 
   /**
    * @name forEach
-   * @param {function(SLLNode, number, SinglyLinkedList)} callback
+   * @param {function(*, number, SinglyLinkedList)} callback
    * @return {Array.<*>} Array
    */
   forEach(callback) {
@@ -53,7 +53,7 @@ export default class SinglyLinkedList {
       currentNode = nextNode;
       nextNode = currentNode.next;
       currentIndex += 1;
-      callback(currentNode, currentIndex, this);
+      callback(currentNode.value, currentIndex, this);
     }
   }
 
@@ -77,7 +77,7 @@ export default class SinglyLinkedList {
 
   /**
    * @name pop
-   * @return {SLLNode} Node
+   * @return {*} Node value
    */
   pop() {
     if (!this.head) return undefined;
@@ -95,7 +95,7 @@ export default class SinglyLinkedList {
       this.head = null;
       this.tail = null;
     }
-    return oldTail;
+    return oldTail.value;
   }
 
   /**
@@ -119,7 +119,7 @@ export default class SinglyLinkedList {
 
   /**
    * @name shift
-   * @return {SLLNode} Node
+   * @return {*} Node value
    */
   shift() {
     if (!this.head) return undefined;
@@ -127,44 +127,64 @@ export default class SinglyLinkedList {
     this.head = oldHead.next;
     this.length -= 1;
     if (this.length === 0) this.tail = null;
-    return oldHead;
+    return oldHead.value;
   }
 
   /**
-   * @name find
-   * @param {function(SLLNode, number, SinglyLinkedList):boolean} callback
+   * @name findNode
+   * @param {function(*, number, SinglyLinkedList):boolean} callback
    * @param {boolean} [returnIndex]
-   * @return {SLLNode|number} Copied list
+   * @return {SLLNode|number} Node
    */
-  find(callback, returnIndex = false) {
+  findNode(callback, returnIndex = false) {
     if (typeof callback !== 'function') throw new Error('callback argument is function');
     let nextNode = this.head,
-      currentNode = null,
+      currentNode,
       currentIndex = -1,
       found = false;
     while (nextNode && !found) {
       currentIndex += 1;
       currentNode = nextNode;
-      found = !!callback(currentNode, currentIndex, this);
+      found = !!callback(currentNode.value, currentIndex, this);
       nextNode = currentNode.next;
     }
     if (returnIndex) return found ? currentIndex : -1;
-    return found ? currentNode : null;
+    return found ? currentNode : undefined;
+  }
+
+  /**
+   * @name find
+   * @param {function(*, number, SinglyLinkedList):boolean} callback
+   * @return {*} Node value
+   */
+  find(callback) {
+    let node = this.findNode(callback);
+    return node ? node.value : undefined;
   }
 
   /**
    * @name findIndex
-   * @param {function(SLLNode, number):boolean} callback
+   * @param {function(*, number, SinglyLinkedList):boolean} callback
    * @return {number} Copied list
    */
   findIndex(callback) {
-    return this.find(callback, true);
+    return this.findNode(callback, true);
   }
 
   /**
    * @name get
    * @param {number} index
    * @return {SLLNode} SLL Node
+   */
+  getNode(index) {
+    if (index < 0 || index >= this.length) return undefined;
+    return this.findNode((n, i) => i === index);
+  }
+
+  /**
+   * @name get
+   * @param {number} index
+   * @return {*} Node value
    */
   get(index) {
     if (index < 0 || index >= this.length) return undefined;
@@ -175,10 +195,10 @@ export default class SinglyLinkedList {
    * @name set
    * @param {number} index
    * @param {*} value
-   * @return {boolean} SLL Node
+   * @return {boolean} Inserted
    */
   set(index, value) {
-    let currentNode = this.get(index);
+    let currentNode = this.getNode(index);
     if (currentNode) {
       currentNode.value = value;
       return true;
@@ -190,14 +210,14 @@ export default class SinglyLinkedList {
    * @name insert
    * @param {number} index
    * @param {*} value
-   * @return {SinglyLinkedList} SLL Node
+   * @return {SinglyLinkedList} List
    */
   insert(index, value) {
     if (index < 0 || index > this.length) return this;
     if (index === 0) return this.unshift(value);
     if (index === this.length) return this.push(value);
     const newNode = new SLLNode(value);
-    let prevNode = this.get(index - 1);
+    let prevNode = this.getNode(index - 1);
     newNode.next = prevNode.next;
     prevNode.next = newNode;
     this.length += 1;
@@ -207,36 +227,36 @@ export default class SinglyLinkedList {
   /**
    * @name remove
    * @param {number} index
-   * @return {SLLNode} SLL Node
+   * @return {*} Node value
    */
   remove(index) {
     if (index < 0 || index >= this.length) return null;
     if (index === 0) return this.shift();
     if (index === this.length - 1) return this.pop();
-    let prevNode = this.get(index - 1);
+    let prevNode = this.getNode(index - 1);
     let toRemove = prevNode.next;
     prevNode.next = toRemove.next;
     this.length -= 1;
-    return toRemove;
+    return toRemove.value;
   }
 
   /**
    * @name reverse
-   * @return {SinglyLinkedList} Reversed list
+   * @return {SinglyLinkedList} List
    */
   reverse() {
     let reversedList = new SinglyLinkedList();
-    this.forEach(node => reversedList.unshift(node.value));
+    this.forEach(value => reversedList.unshift(value));
     return reversedList;
   }
 
   /**
    * @name copy
-   * @return {SinglyLinkedList} Copied list
+   * @return {SinglyLinkedList} List
    */
   copy() {
     let copiedList = new SinglyLinkedList();
-    this.forEach(node => copiedList.push(node.value));
+    this.forEach(value => copiedList.push(value));
     return copiedList;
   }
 
@@ -246,7 +266,7 @@ export default class SinglyLinkedList {
    */
   toArray() {
     let result = [];
-    this.forEach(node => result.push(node.value));
+    this.forEach(value => result.push(value));
     return result;
   }
 }
