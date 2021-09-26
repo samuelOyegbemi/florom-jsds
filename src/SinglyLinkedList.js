@@ -28,7 +28,7 @@ export default class SinglyLinkedList {
 
   /**
    * Iterator
-   * @return {Generator<SLLNode, void, ?>} Generator
+   * @return {Generator<*, void, ?>} Generator
    */
   *[Symbol.iterator]() {
     let nextNode = this.head;
