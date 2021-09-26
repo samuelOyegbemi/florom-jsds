@@ -1,4 +1,4 @@
-import Node from '../Node';
+import Node from './Node';
 
 /**
  * @class SLLNode
@@ -44,24 +44,6 @@ export default class SinglyLinkedList {
     return this;
   }
 
-  // /**
-  //  * @name reduce
-  //  * @param {function(*, *, *, *):*} accumulator
-  //  * @param {*} [initial]
-  //  * @return {*} Callback result
-  //  */
-  // reduce(accumulator, initial) {
-  //   let current = this.head;
-  //   let prev = initial;
-  //   let i = 0;
-  //   do {
-  //     prev = accumulator(prev, current, i, this);
-  //     i += 1;
-  //     current = current.next;
-  //   } while (current);
-  //   return prev;
-  // }
-
   /**
    * @name pop
    * @return {SLLNode} Node
@@ -93,8 +75,13 @@ export default class SinglyLinkedList {
   unshift(value) {
     const newHead = new SLLNode(value);
     let oldHead = this.head;
-    this.head = newHead;
-    this.head.next = oldHead;
+    if (!oldHead) {
+      this.head = newHead;
+      this.tail = this.head;
+    } else {
+      this.head = newHead;
+      this.head.next = oldHead;
+    }
     this.length += 1;
     return this;
   }
@@ -113,19 +100,44 @@ export default class SinglyLinkedList {
   }
 
   /**
+   * @name find
+   * @param {function(SLLNode, number):boolean} callback
+   * @param {boolean} [returnIndex]
+   * @return {SLLNode|number} Copied list
+   */
+  find(callback, returnIndex = false) {
+    if (typeof callback !== 'function') throw new Error('callback argument is function');
+    let nextNode = this.head,
+      currentNode = null,
+      currentIndex = -1,
+      found = false;
+    while (nextNode && !found) {
+      currentIndex += 1;
+      currentNode = nextNode;
+      found = !!callback(currentNode, currentIndex);
+      nextNode = currentNode.next;
+    }
+    if (returnIndex) return found ? currentIndex : -1;
+    return found ? currentNode : null;
+  }
+
+  /**
+   * @name findIndex
+   * @param {function(SLLNode, number):boolean} callback
+   * @return {number} Copied list
+   */
+  findIndex(callback) {
+    return this.find(callback, true);
+  }
+
+  /**
    * @name get
    * @param {number} index
    * @return {SLLNode} SLL Node
    */
   get(index) {
     if (index < 0 || index >= this.length) return undefined;
-    let currentIndex = 0;
-    let currentNode = this.head;
-    while (currentIndex !== index) {
-      currentIndex += 1;
-      currentNode = currentNode.next;
-    }
-    return currentNode;
+    return this.find((n, i) => i === index);
   }
 
   /**
@@ -147,17 +159,65 @@ export default class SinglyLinkedList {
    * @name insert
    * @param {number} index
    * @param {*} value
-   * @return {boolean} SLL Node
+   * @return {SinglyLinkedList} SLL Node
    */
   insert(index, value) {
-    if (index < 0 || index > this.length) return false;
-    if (index === 0) return !!this.unshift(value);
-    if (index === this.length) return !!this.push(value);
+    if (index < 0 || index > this.length) return this;
+    if (index === 0) return this.unshift(value);
+    if (index === this.length) return this.push(value);
     const newNode = new SLLNode(value);
     let prevNode = this.get(index - 1);
     newNode.next = prevNode.next;
     prevNode.next = newNode;
     this.length += 1;
-    return true;
+    return this;
+  }
+
+  /**
+   * @name remove
+   * @param {number} index
+   * @return {SLLNode} SLL Node
+   */
+  remove(index) {
+    if (index < 0 || index >= this.length) return null;
+    if (index === 0) return this.shift();
+    if (index === this.length - 1) return this.pop();
+    let prevNode = this.get(index - 1);
+    let toRemove = prevNode.next;
+    prevNode.next = toRemove.next;
+    this.length -= 1;
+    return toRemove;
+  }
+
+  /**
+   * @name reverse
+   * @return {SinglyLinkedList} Reversed list
+   */
+  reverse() {
+    let reversedList = new SinglyLinkedList();
+    let next = this.head;
+    let current = null;
+    while (next) {
+      current = next;
+      reversedList.unshift(current.value);
+      next = current.next;
+    }
+    return reversedList;
+  }
+
+  /**
+   * @name copy
+   * @return {SinglyLinkedList} Copied list
+   */
+  copy() {
+    let copiedList = new SinglyLinkedList();
+    let next = this.head;
+    let current = null;
+    while (next) {
+      current = next;
+      copiedList.push(current.value);
+      next = current.next;
+    }
+    return copiedList;
   }
 }
