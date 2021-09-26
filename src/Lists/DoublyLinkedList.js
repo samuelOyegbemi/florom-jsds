@@ -115,21 +115,10 @@ export default class DoublyLinkedList extends LinkedList {
   /**
    * @name get
    * @param {number} index
-   * @return {ListNode} SLL Node
+   * @return {ListNode} Node
    */
   getNode(index) {
     if (index <= this.length / 2) super.getNode(index);
     return this.findNodeReverse((n, i) => i === index);
-  }
-
-  /**
-   * @name get
-   * @param {number} index
-   * @return {*} Node value
-   */
-  get(index) {
-    if (index <= this.length / 2) super.get(index);
-    let node = this.findNodeReverse((n, i) => i === index);
-    return node ? node.value : undefined;
   }
 }

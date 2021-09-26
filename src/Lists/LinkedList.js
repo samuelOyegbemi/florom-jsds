@@ -97,7 +97,7 @@ export default class LinkedList {
   /**
    * @name get
    * @param {number} index
-   * @return {ListNode} SLL Node
+   * @return {ListNode} Node
    */
   getNode(index) {
     if (index < 0 || index >= this.length) return undefined;
@@ -110,8 +110,8 @@ export default class LinkedList {
    * @return {*} Node value
    */
   get(index) {
-    if (index < 0 || index >= this.length) return undefined;
-    return this.find((n, i) => i === index);
+    let node = this.getNode(index);
+    return node ? node.value : undefined;
   }
 
   /**
