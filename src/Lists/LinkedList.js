@@ -46,14 +46,12 @@ export default class LinkedList {
    * @return {Array.<*>} Array
    */
   forEach(callback) {
-    let nextNode = this.head;
+    let currentNode = this.head;
     let currentIndex = -1;
-    let currentNode = null;
-    while (nextNode) {
-      currentNode = nextNode;
-      nextNode = currentNode.next;
+    while (currentNode) {
       currentIndex += 1;
       callback(currentNode.value, currentIndex, this);
+      currentNode = currentNode.next;
     }
   }
 
@@ -65,15 +63,13 @@ export default class LinkedList {
    */
   findNode(callback, returnIndex = false) {
     if (typeof callback !== 'function') throw new Error('callback argument is function');
-    let nextNode = this.head,
-      currentNode,
+    let currentNode = this.head,
       currentIndex = -1,
       found = false;
-    while (nextNode && !found) {
+    while (currentNode && !found) {
       currentIndex += 1;
-      currentNode = nextNode;
       found = !!callback(currentNode.value, currentIndex, this);
-      nextNode = currentNode.next;
+      currentNode = currentNode.next;
     }
     if (returnIndex) return found ? currentIndex : -1;
     return found ? currentNode : undefined;

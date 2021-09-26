@@ -91,4 +91,45 @@ export default class DoublyLinkedList extends LinkedList {
     this.length -= 1;
     return oldHead.value;
   }
+
+  /**
+   * @name findNodeReverse
+   * @param {function(*, number, DoublyLinkedList):boolean} callback
+   * @param {boolean} [returnIndex]
+   * @return {DLListNode|number} Node
+   */
+  findNodeReverse(callback, returnIndex = false) {
+    if (typeof callback !== 'function') throw new Error('callback argument is function');
+    let currentNode = this.tail,
+      currentIndex = this.length,
+      found = false;
+    while (currentNode && !found) {
+      currentIndex -= 1;
+      found = !!callback(currentNode.value, currentIndex, this);
+      currentNode = currentNode.prev;
+    }
+    if (returnIndex) return found ? currentIndex : -1;
+    return found ? currentNode : undefined;
+  }
+
+  /**
+   * @name get
+   * @param {number} index
+   * @return {ListNode} SLL Node
+   */
+  getNode(index) {
+    if (index <= this.length / 2) super.getNode(index);
+    return this.findNodeReverse((n, i) => i === index);
+  }
+
+  /**
+   * @name get
+   * @param {number} index
+   * @return {*} Node value
+   */
+  get(index) {
+    if (index <= this.length / 2) super.get(index);
+    let node = this.findNodeReverse((n, i) => i === index);
+    return node ? node.value : undefined;
+  }
 }
